@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/testapi/media/favicon.ico">
+    <title>Vehicle Detection Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0e7ff, #dbeafe);
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: white;
+            padding: 0 2rem;
+            box-shadow: 0 4px 15px rgba(30, 64, 175, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .header:hover {
+            box-shadow: 0 6px 20px rgba(30, 64, 175, 0.5);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .header-nav a {
+            color: white;
+            padding: 0.75rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .header-nav a:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-nav i {
+            font-size: 1.4rem;
+        }
+
+        .main-content {
+            padding: 1.5rem 2rem;
+            background: #ffffff;
+            min-height: calc(100vh - 70px);
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -5px 25px rgba(30, 64, 175, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        @media (min-width: 768px) {
+            .main-content {
+                display: grid;
+                grid-template-columns: 1fr 2fr;
+                gap: 1.5rem;
+            }
+        }
+
+        .overview-section {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
+            gap: 1rem;
+            padding: 0.5rem 0;
+        }
+
+        .overview-card, .report-card {
+            background: linear-gradient(145deg, #ffffff, #eff6ff);
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(30, 64, 175, 0.1);
+            transition: all 0.3s ease;
+            border: none;
+            text-align: center;
+        }
+
+        .overview-card:hover, .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(30, 64, 175, 0.2);
+            background: linear-gradient(145deg, #dbeafe, #f0f9ff);
+        }
+
+        .overview-card h3, .report-card h3 {
+            font-size: 0.95rem;
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .overview-card p, .report-card p {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .reports-section {
+            padding: 0.5rem 0;
+        }
+
+        .report-card {
+            padding: 1.25rem;
+        }
+
+        .event-card {
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(30, 64, 175, 0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            cursor: pointer; /* Indicate clickable events */
+        }
+
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(30, 64, 175, 0.15);
+            background: #f9fbff;
+        }
+
+        .all-events-list {
+            background: linear-gradient(135deg, #1f2937, #374151);
+            padding: 1.25rem;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(30, 64, 175, 0.1);
+            overflow-y: auto;
+            height: calc(100vh - 120px);
+        }
+
+        .all-events-list h3 {
+            color: #e5e7eb;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .all-event-item {
+            background: #ffffff;
+            padding: 0.75rem;
+            border-radius: 10px;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .all-event-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 6px 18px rgba(30, 64, 175, 0.1);
+        }
+
+        .all-event-item p {
+            margin: 0;
+            color: #374151;
+        }
+
+        .all-event-item .event-time {
+            color: #9ca3af;
+            font-size: 0.85rem;
+        }
+
+        .all-event-item .event-type {
+            color: #1f2937;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .all-event-item .metadata {
+            color: #6b7280;
+            font-size: 0.75rem;
+        }
+
+        .all-events-filters {
+            margin-bottom: 1rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .all-events-filters input, .all-events-filters select {
+            width: 100%;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 8px;
+            background: #4b5563;
+            color: #e5e7eb;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .all-events-filters input:focus, .all-events-filters select:focus {
+            outline: none;
+            background: #6b7280;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+        }
+
+        .pagination {
+            background: #1f2937;
+            padding: 0.5rem;
+            border-radius: 8px;
+            color: #d1d5db;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #bfdbfe;
+            border-top: 6px solid #1e40af;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            box-shadow: 0 0 20px rgba(30, 64, 175, 0.5);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden { display: none; }
+
+        @media (max-width: 767px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            .all-events-list {
+                height: calc(50vh - 90px);
+            }
+            .overview-section {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+            .all-events-filters {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr 1.5fr;
+                gap: 1rem;
+            }
+            .all-events-list {
+                height: calc(80vh - 100px);
+            }
+            .overview-section {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+            }
+        }
+
+        .logout-icon i {
+            transition: all 0.3s ease;
+        }
+
+        .logout-icon:hover i {
+            color: #ef4444;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div id="loading" class="loading">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <h1>Vehicle Detection Dashboard</h1>
+        <div class="header-nav">
+            <a id="overviewLink" title="Overview"><i class="fas fa-tachometer-alt"></i></a>
+            <a id="reportsLink" title="Reports"><i class="fas fa-file-alt"></i></a>
+            <a href="{% url 'logout' %}" title="Logout" class="logout-icon">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="dashboard" class="main-content hidden">
+        <!-- All Events List (Left Side) -->
+        <div class="all-events-list">
+            <!-- Filters for All Events List -->
+            <div class="all-events-filters">
+                <input type="text" id="vehicleSearch" placeholder="Search truck/trailer number..." class="w-full">
+                <input type="date" id="dateFilter" class="w-full">
+                <select id="vehicleTypeFilter" class="w-full">
+                    <option value="">All Vehicle Types</option>
+                    <option value="car">Car</option>
+                    <option value="truck">Truck</option>
+                    <option value="bus">Bus</option>
+                    <option value="motorcycle">Motorcycle</option>
+                </select>
+            </div>
+            <h3>All Events List</h3>
+            <div id="allEventsContainer" class="space-y-2"></div>
+            <div class="pagination">
+                <span>Page 1</span> | <span>Showing <span id="allEventsCount">0</span> results</span>
+            </div>
+        </div>
+
+        <!-- Overview and Reports (Right Side) -->
+        <div class="space-y-3 flex flex-col h-full">
+            <!-- Overview Section -->
+            <div id="overviewSection" class="overview-section">
+                <div class="overview-card">
+                    <h3>Total Events</h3>
+                    <p id="totalEvents">0</p>
+                </div>
+                <div class="overview-card">
+                    <h3>Truck Entries</h3>
+                    <p id="truckEntryCount">0</p>
+                </div>
+                <div class="overview-card">
+                    <h3>Truck Exits</h3>
+                    <p id="truckExitCount">0</p>
+                </div>
+                <div class="overview-card">
+                    <h3>Trailer Entries</h3>
+                    <p id="trailerEntryCount">0</p>
+                </div>
+                <div class="overview-card">
+                    <h3>Trailer Exits</h3>
+                    <p id="trailerExitCount">0</p>
+                </div>
+                <div class="overview-card">
+                    <h3>Latest Update</h3>
+                    <p id="latestUpdate">--</p>
+                </div>
+            </div>
+
+            <!-- Reports Section -->
+            <div id="reportsSection" class="reports-section hidden">
+                <div class="report-card">
+                    <h3>Generate Report</h3>
+                    <label class="block font-semibold text-gray-700 mb-0.5">From Date</label>
+                    <input type="date" id="reportFromDate" class="w-full px-3 py-1 rounded-lg border border-gray-300 focus:outline-none mb-1">
+                    <label class="block font-semibold text-gray-700 mb-0.5">To Date</label>
+                    <input type="date" id="reportToDate" class="w-full px-3 py-1 rounded-lg border border-gray-300 focus:outline-none mb-1">
+                    <button id="downloadReport" class="mt-1 bg-blue-600 text-white px-4 py-1.5 rounded-lg hover:bg-blue-700 transition">Download Report</button>
+                </div>
+            </div>
+
+            <!-- Events Container (Show Only Newest Event or Selected Event) -->
+            <div id="eventsContainer" class="flex-1 space-y-2 overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <!-- Event Card Template (for both event lists) -->
+    <template id="eventCardTemplate">
+        <div class="event-card">
+            <div class="p-3">
+                <div class="mb-1.5">
+                    <span class="truck-status px-1.5 py-0.25 rounded-full text-xs font-medium mr-2"></span>
+                    <span class="trailer-status px-1.5 py-0.25 rounded-full text-xs font-medium"></span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <div class="bg-gray-50 p-1.5 rounded-lg mb-1">
+                            <p class="font-semibold text-gray-700 text-sm">Truck Number Plate</p>
+                            <p class="truck-number text-gray-600 text-sm"></p>
+                        </div>
+                        <h3 class="font-semibold mb-1 text-gray-700 text-sm">Truck</h3>
+                        <img class="camera1-image w-full h-40 object-cover rounded-lg" alt="Camera 1">
+                        <div class="bg-gray-50 p-1.5 rounded-lg mt-1">
+                            <p class="font-semibold text-gray-700 text-sm">Date</p>
+                            <p class="event-date-truck text-gray-600 text-sm"></p>
+                            <p class="font-semibold text-gray-700 mt-0.5 text-sm">Time</p>
+                            <p class="event-time-truck text-gray-600 text-sm"></p>
+                            <p class="font-semibold text-gray-700 mt-0.5 text-sm">Duration</p>
+                            <p class="truck-duration text-gray-600 text-sm"></p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="bg-gray-50 p-1.5 rounded-lg mb-1">
+                            <p class="font-semibold text-gray-700 text-sm">Trailer Number Plate</p>
+                            <p class="trailer-number text-gray-600 text-sm"></p>
+                        </div>
+                        <h3 class="font-semibold mb-1 text-gray-700 text-sm">Trailer</h3>
+                        <img class="camera2-image w-full h-40 object-cover rounded-lg" alt="Camera 2">
+                        <div class="bg-gray-50 p-1.5 rounded-lg mt-1">
+                            <p class="font-semibold text-gray-700 text-sm">Date</p>
+                            <p class="event-date-trailer text-gray-600 text-sm"></p>
+                            <p class="font-semibold text-gray-700 mt-0.5 text-sm">Time</p>
+                            <p class="event-time-trailer text-gray-600 text-sm"></p>
+                            <p class="font-semibold text-gray-700 mt-0.5 text-sm">Duration</p>
+                            <p class="trailer-duration text-gray-600 text-sm"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        class Dashboard {
+            constructor() {
+                this.eventsContainer = document.getElementById('eventsContainer');
+                this.allEventsContainer = document.getElementById('allEventsContainer');
+                this.template = document.getElementById('eventCardTemplate');
+                this.loading = document.getElementById('loading');
+                this.dashboard = document.getElementById('dashboard');
+                this.overviewSection = document.getElementById('overviewSection');
+                this.reportsSection = document.getElementById('reportsSection');
+                this.isFetching = false;
+                this.isFirstLoad = true;
+                this.truckEntries = new Map();
+                this.trailerEntries = new Map();
+                this.isReportsVisible = false;
+                this.allEvents = [];
+
+                this.bindFilters();
+                this.bindHeaderLinks();
+                this.bindReportDownload();
+                this.loadEvents();
+            }
+
+            bindFilters() {
+                ['vehicleSearch', 'dateFilter', 'vehicleTypeFilter'].forEach(id => {
+                    document.getElementById(id).addEventListener('input', () => {
+                        if (!this.isFetching) this.loadEvents();
+                    });
+                });
+            }
+
+            bindHeaderLinks() {
+                document.getElementById('overviewLink').addEventListener('click', () => {
+                    this.overviewSection.classList.remove('hidden');
+                    this.reportsSection.classList.add('hidden');
+                    this.isReportsVisible = false;
+                });
+                document.getElementById('reportsLink').addEventListener('click', () => {
+                    if (this.isReportsVisible) {
+                        this.overviewSection.classList.remove('hidden');
+                        this.reportsSection.classList.add('hidden');
+                        this.isReportsVisible = false;
+                    } else {
+                        this.overviewSection.classList.add('hidden');
+                        this.reportsSection.classList.remove('hidden');
+                        this.isReportsVisible = true;
+                    }
+                });
+            }
+
+            bindReportDownload() {
+                document.getElementById('downloadReport').addEventListener('click', () => {
+                    const fromDate = document.getElementById('reportFromDate').value;
+                    const toDate = document.getElementById('reportToDate').value;
+                    if (fromDate && toDate) {
+                        if (new Date(fromDate) > new Date(toDate)) {
+                            alert('From Date must be earlier than To Date.');
+                            return;
+                        }
+                        this.downloadEventsReport(fromDate, toDate);
+                    } else {
+                        alert('Please select both From Date and To Date to download the report.');
+                    }
+                });
+            }
+
+            showLoading() {
+                if (this.isFirstLoad) {
+                    this.loading.classList.remove('hidden');
+                }
+            }
+
+            hideLoading() {
+                this.loading.classList.add('hidden');
+            }
+
+            showDashboard() {
+                this.dashboard.classList.remove('hidden');
+            }
+
+            async loadEvents() {
+                if (this.isFetching) return;
+                this.isFetching = true;
+                this.showLoading();
+
+                try {
+                    const searchQuery = document.getElementById('vehicleSearch').value.trim();
+                    const dateFilter = document.getElementById('dateFilter').value;
+                    const vehicleType = document.getElementById('vehicleTypeFilter').value;
+
+                    const params = new URLSearchParams();
+                    if (searchQuery) params.append('search', searchQuery);
+                    if (dateFilter) params.append('date', dateFilter);
+                    if (vehicleType) params.append('vehicle_type', vehicleType);
+
+                    const url = `/api/api/events/?${params.toString()}`;
+                    const response = await fetch(url);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
+                    const events = await response.json();
+                    this.renderEvents(events);
+
+                    if (this.isFirstLoad) {
+                        this.hideLoading();
+                        this.showDashboard();
+                        this.isFirstLoad = false;
+                    }
+                } catch (error) {
+                    console.error('Error loading events:', error);
+                    this.eventsContainer.innerHTML = '<p class="text-red-500">Failed to load events. Please try again later.</p>';
+                    this.allEventsContainer.innerHTML = '<p class="text-red-500">Failed to load all events. Please try again later.</p>';
+                    if (this.isFirstLoad) {
+                        this.hideLoading();
+                        this.showDashboard();
+                        this.isFirstLoad = false;
+                    }
+                } finally {
+                    this.isFetching = false;
+                }
+            }
+
+            calculateDuration(entryTime, exitTime) {
+                if (!entryTime || !exitTime) return 'N/A';
+                const diffMs = new Date(exitTime) - new Date(entryTime);
+                const hours = Math.floor(diffMs / 3600000);
+                const minutes = Math.floor((diffMs % 3600000) / 60000);
+                const seconds = Math.floor((diffMs % 60000) / 1000);
+                return `${hours}h ${minutes}m ${seconds}s`;
+            }
+
+            renderEvents(events) {
+                this.eventsContainer.innerHTML = '';
+                this.allEventsContainer.innerHTML = '';
+                this.truckEntries.clear();
+                this.trailerEntries.clear();
+                this.allEvents = [];
+
+                if (!events || events.length === 0) {
+                    this.eventsContainer.innerHTML = '<p class="text-gray-500">No newest event found.</p>';
+                    this.allEventsContainer.innerHTML = '<p class="text-gray-500">No all events found.</p>';
+                    return;
+                }
+
+                let truckEntryCount = 0, truckExitCount = 0, trailerEntryCount = 0, trailerExitCount = 0;
+                const sortedEvents = events.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+                sortedEvents.forEach(event => {
+                    const newEvent = { ...event };
+
+                    // Handle truck
+                    if (event.truck_number) {
+                        const truckTimestamp = event.truck_timestamp || event.timestamp;
+                        if (!this.truckEntries.has(event.truck_number)) {
+                            // First occurrence: Entry
+                            this.truckEntries.set(event.truck_number, {
+                                entryTime: truckTimestamp,
+                                entryEvent: newEvent
+                            });
+                            newEvent.truckStatus = 'Truck Entry';
+                            newEvent.truckEntryTime = truckTimestamp;
+                            newEvent.truckExitTime = null;
+                            newEvent.truckDuration = 'N/A';
+                            truckEntryCount++;
+                        } else {
+                            // Second occurrence: Exit
+                            const entryData = this.truckEntries.get(event.truck_number);
+                            newEvent.truckStatus = 'Truck Exit';
+                            newEvent.truckEntryTime = entryData.entryTime;
+                            newEvent.truckExitTime = truckTimestamp;
+                            newEvent.truckDuration = this.calculateDuration(entryData.entryTime, truckTimestamp);
+                            truckExitCount++;
+                            this.truckEntries.delete(event.truck_number); // Remove from tracking after exit
+                        }
+                    }
+
+                    // Handle trailer
+                    if (event.trailer_number) {
+                        const trailerTimestamp = event.trailer_timestamp || event.timestamp;
+                        if (!this.trailerEntries.has(event.trailer_number)) {
+                            // First occurrence: Entry
+                            this.trailerEntries.set(event.trailer_number, {
+                                entryTime: trailerTimestamp,
+                                entryEvent: newEvent
+                            });
+                            newEvent.trailerStatus = 'Trailer Entry';
+                            newEvent.trailerEntryTime = trailerTimestamp;
+                            newEvent.trailerExitTime = null;
+                            newEvent.trailerDuration = 'N/A';
+                            trailerEntryCount++;
+                        } else {
+                            // Second occurrence: Exit
+                            const entryData = this.trailerEntries.get(event.trailer_number);
+                            newEvent.trailerStatus = 'Trailer Exit';
+                            newEvent.trailerEntryTime = entryData.entryTime;
+                            newEvent.trailerExitTime = trailerTimestamp;
+                            newEvent.trailerDuration = this.calculateDuration(entryData.entryTime, trailerTimestamp);
+                            trailerExitCount++;
+                            this.trailerEntries.delete(event.trailer_number); // Remove from tracking after exit
+                        }
+                    }
+
+                    this.allEvents.push(newEvent);
+                });
+
+                // Update overview stats
+                document.getElementById('totalEvents').textContent = this.allEvents.length;
+                document.getElementById('truckEntryCount').textContent = truckEntryCount;
+                document.getElementById('truckExitCount').textContent = truckExitCount;
+                document.getElementById('trailerEntryCount').textContent = trailerEntryCount;
+                document.getElementById('trailerExitCount').textContent = trailerExitCount;
+                document.getElementById('latestUpdate').textContent = new Date().toLocaleTimeString();
+
+                // Sort all events by timestamp descending for display
+                const displayEvents = this.allEvents.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                // Show the newest event initially in the Events Container
+                if (displayEvents.length > 0) {
+                    const newestEvent = displayEvents[0];
+                    const newestCard = this.template.content.cloneNode(true);
+                    this.renderEventCard(newestCard, newestEvent);
+                    this.eventsContainer.appendChild(newestCard);
+                }
+
+                // Render all events in the All Events Container
+                displayEvents.forEach(event => {
+                    const card = this.template.content.cloneNode(true);
+                    this.renderEventCard(card, event);
+                    const eventCard = card.querySelector('.event-card');
+                    eventCard.addEventListener('click', () => {
+                        this.eventsContainer.innerHTML = '';
+                        const selectedCard = this.template.content.cloneNode(true);
+                        this.renderEventCard(selectedCard, event);
+                        this.eventsContainer.appendChild(selectedCard);
+                    });
+                    this.allEventsContainer.appendChild(card);
+                });
+
+                document.getElementById('allEventsCount').textContent = displayEvents.length;
+            }
+
+            renderEventCard(card, event) {
+                card.querySelector('.truck-number').textContent = event.truck_number || 'N/A';
+                card.querySelector('.trailer-number').textContent = event.trailer_number || 'N/A';
+
+                const truckStatusSpan = card.querySelector('.truck-status');
+                const trailerStatusSpan = card.querySelector('.trailer-status');
+                truckStatusSpan.textContent = event.truckStatus || 'N/A';
+                trailerStatusSpan.textContent = event.trailerStatus || 'N/A';
+
+                const camera1Img = card.querySelector('.camera1-image');
+                const camera2Img = card.querySelector('.camera2-image');
+                camera1Img.src = event.camera1_image ? `data:image/jpeg;base64,${event.camera1_image}` : 'https://via.placeholder.com/150?text=No+Image';
+                camera2Img.src = event.camera2_image ? `data:image/jpeg;base64,${event.camera2_image}` : 'https://via.placeholder.com/150?text=No+Image';
+
+                // Truck timestamps: Use truck_timestamp directly for display
+                const truckDisplayTime = event.truck_number ? (event.truck_timestamp || event.timestamp) : null;
+                const truckDatetime = truckDisplayTime ? new Date(truckDisplayTime) : null;
+                card.querySelector('.event-date-truck').textContent = truckDatetime ? truckDatetime.toLocaleDateString() : 'N/A';
+                card.querySelector('.event-time-truck').textContent = truckDatetime ? truckDatetime.toLocaleTimeString() : 'N/A';
+
+                // Trailer timestamps: Use trailer_timestamp directly for display
+                const trailerDisplayTime = event.trailer_number ? (event.trailer_timestamp || event.timestamp) : null;
+                const trailerDatetime = trailerDisplayTime ? new Date(trailerDisplayTime) : null;
+                card.querySelector('.event-date-trailer').textContent = trailerDatetime ? trailerDatetime.toLocaleDateString() : 'N/A';
+                card.querySelector('.event-time-trailer').textContent = trailerDatetime ? trailerDatetime.toLocaleTimeString() : 'N/A';
+
+                // Durations
+                card.querySelector('.truck-duration').textContent = event.truckDuration || 'N/A';
+                card.querySelector('.trailer-duration').textContent = event.trailerDuration || 'N/A';
+
+                // Styling for statuses
+                if (event.truckStatus === 'Truck Entry') {
+                    truckStatusSpan.classList.add('bg-blue-200', 'text-blue-800');
+                } else if (event.truckStatus === 'Truck Exit') {
+                    truckStatusSpan.classList.add('bg-red-200', 'text-red-800');
+                } else {
+                    truckStatusSpan.classList.add('bg-gray-200', 'text-gray-800');
+                }
+
+                if (event.trailerStatus === 'Trailer Entry') {
+                    trailerStatusSpan.classList.add('bg-blue-200', 'text-blue-800');
+                } else if (event.trailerStatus === 'Trailer Exit') {
+                    trailerStatusSpan.classList.add('bg-red-200', 'text-red-800');
+                } else {
+                    trailerStatusSpan.classList.add('bg-gray-200', 'text-gray-800');
+                }
+            }
+
+            async downloadEventsReport(fromDate, toDate) {
+                try {
+                    const params = new URLSearchParams();
+                    params.append('from_date', fromDate);
+                    params.append('to_date', toDate);
+
+                    const url = `/api/api/events/?${params.toString()}`;
+                    const response = await fetch(url);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
+                    const events = await response.json();
+                    if (!events || events.length === 0) {
+                        alert('No events found for the selected date range.');
+                        return;
+                    }
+
+                    const truckEntries = new Map();
+                    const trailerEntries = new Map();
+                    const processedEvents = [];
+                    const sortedEvents = events.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+                    sortedEvents.forEach(event => {
+                        const newEvent = { ...event };
+
+                        // Handle truck
+                        if (event.truck_number) {
+                            const truckTimestamp = event.truck_timestamp || event.timestamp;
+                            if (!truckEntries.has(event.truck_number)) {
+                                truckEntries.set(event.truck_number, {
+                                    entryTime: truckTimestamp,
+                                    entryEvent: newEvent
+                                });
+                                newEvent.truckStatus = 'Truck Entry';
+                                newEvent.truckEntryTime = truckTimestamp;
+                                newEvent.truckExitTime = null;
+                                newEvent.truckDuration = 'N/A';
+                            } else {
+                                const entryData = truckEntries.get(event.truck_number);
+                                newEvent.truckStatus = 'Truck Exit';
+                                newEvent.truckEntryTime = entryData.entryTime;
+                                newEvent.truckExitTime = truckTimestamp;
+                                newEvent.truckDuration = this.calculateDuration(entryData.entryTime, truckTimestamp);
+                                truckEntries.delete(event.truck_number);
+                            }
+                        }
+
+                        // Handle trailer
+                        if (event.trailer_number) {
+                            const trailerTimestamp = event.trailer_timestamp || event.timestamp;
+                            if (!trailerEntries.has(event.trailer_number)) {
+                                trailerEntries.set(event.trailer_number, {
+                                    entryTime: trailerTimestamp,
+                                    entryEvent: newEvent
+                                });
+                                newEvent.trailerStatus = 'Trailer Entry';
+                                newEvent.trailerEntryTime = trailerTimestamp;
+                                newEvent.trailerExitTime = null;
+                                newEvent.trailerDuration = 'N/A';
+                            } else {
+                                const entryData = trailerEntries.get(event.trailer_number);
+                                newEvent.trailerStatus = 'Trailer Exit';
+                                newEvent.trailerEntryTime = entryData.entryTime;
+                                newEvent.trailerExitTime = trailerTimestamp;
+                                newEvent.trailerDuration = this.calculateDuration(entryData.entryTime, trailerTimestamp);
+                                trailerEntries.delete(event.trailer_number);
+                            }
+                        }
+
+                        processedEvents.push(newEvent);
+                    });
+
+                    const csvContent = [
+                        'Truck Number,Trailer Number,Truck Status,Trailer Status,Entry Date Time,Exit Date Time,Truck Duration,Trailer Duration',
+                        ...processedEvents.map(event => {
+                            const entryDatetime = event.truckEntryTime || event.trailerEntryTime ? new Date(event.truckEntryTime || event.trailerEntryTime) : null;
+                            const exitDatetime = event.truckExitTime || event.trailerExitTime ? new Date(event.truckExitTime || event.trailerExitTime) : null;
+                            const formatDateTime = (dt) => {
+                                if (!dt) return 'N/A';
+                                const year = dt.getFullYear();
+                                const month = String(dt.getMonth() + 1).padStart(2, '0');
+                                const day = String(dt.getDate()).padStart(2, '0');
+                                const hours = String(dt.getHours()).padStart(2, '0');
+                                const minutes = String(dt.getMinutes()).padStart(2, '0');
+                                const seconds = String(dt.getSeconds()).padStart(2, '0');
+                                return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+                            };
+                            const entryDateTimeString = formatDateTime(entryDatetime);
+                            const exitDateTimeString = formatDateTime(exitDatetime);
+                            return `"${event.truck_number || 'N/A'}","${event.trailer_number || 'N/A'}","${event.truckStatus || 'N/A'}","${event.trailerStatus || 'N/A'}","${entryDateTimeString}","${exitDateTimeString}","${event.truckDuration || 'N/A'}","${event.trailerDuration || 'N/A'}"`;
+                        })
+                    ].join('\n');
+
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `vehicle_events_${fromDate}_to_${toDate}.csv`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } catch (error) {
+                    console.error('Error downloading report:', error);
+                    alert('Failed to download the report. Please try again.');
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new Dashboard();
+        });
+    </script>
+</body>
+</html>
