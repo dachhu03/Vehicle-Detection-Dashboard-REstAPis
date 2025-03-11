@@ -15,7 +15,9 @@
             background: linear-gradient(135deg, #e0e7ff, #dbeafe);
             margin: 0;
             padding: 0;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
         .header {
@@ -76,12 +78,12 @@
         .main-content {
             padding: 1.5rem 2rem;
             background: #ffffff;
-            min-height: calc(100vh - 70px);
+            flex: 1 0 auto;
             border-radius: 20px 20px 0 0;
             box-shadow: 0 -5px 25px rgba(30, 64, 175, 0.1);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            overflow-y: auto;
         }
 
         @media (min-width: 768px) {
@@ -94,7 +96,7 @@
 
         .overview-section {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
+            grid-template-columns: repeat(3, 1fr);
             gap: 1rem;
             padding: 0.5rem 0;
         }
@@ -142,7 +144,7 @@
             box-shadow: 0 6px 20px rgba(30, 64, 175, 0.1);
             transition: all 0.3s ease;
             overflow: hidden;
-            cursor: pointer; /* Indicate clickable events */
+            cursor: pointer;
         }
 
         .event-card:hover {
@@ -157,7 +159,7 @@
             border-radius: 15px;
             box-shadow: 0 6px 20px rgba(30, 64, 175, 0.1);
             overflow-y: auto;
-            height: calc(100vh - 120px);
+            /* Removed fixed height, will match right sidebar */
         }
 
         .all-events-list h3 {
@@ -266,13 +268,62 @@
 
         .hidden { display: none; }
 
+        /* Footer Styles */
+        .footer {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 -4px 15px rgba(30, 64, 175, 0.3);
+            z-index: 1000;
+            flex-shrink: 0;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-section {
+            font-size: 0.9rem;
+        }
+
+        .footer-section a {
+            color: #dbeafe;
+            text-decoration: none;
+            margin: 0 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        /* Right Sidebar Container */
+        .right-sidebar {
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* Ensure it takes full height of parent */
+        }
+
+        /* Ensure both sidebars match height */
+        @media (min-width: 768px) {
+            .all-events-list, .right-sidebar {
+                height: calc(100vh - 140px); /* Adjust for header (70px) + footer (~70px with padding) */
+            }
+        }
+
         @media (max-width: 767px) {
             .main-content {
                 grid-template-columns: 1fr;
                 padding: 1rem;
             }
             .all-events-list {
-                height: calc(50vh - 90px);
+                height: auto; /* Allow natural height on mobile */
+                max-height: 50vh; /* Limit height on mobile */
             }
             .overview-section {
                 grid-template-columns: repeat(2, 1fr);
@@ -282,6 +333,13 @@
                 grid-template-columns: 1fr;
                 gap: 0.5rem;
             }
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            .right-sidebar {
+                height: auto; /* Allow natural height on mobile */
+            }
         }
 
         @media (min-width: 768px) and (max-width: 1024px) {
@@ -289,8 +347,8 @@
                 grid-template-columns: 1fr 1.5fr;
                 gap: 1rem;
             }
-            .all-events-list {
-                height: calc(80vh - 100px);
+            .all-events-list, .right-sidebar {
+                height: calc(100vh - 140px); /* Consistent with desktop */
             }
             .overview-section {
                 grid-template-columns: repeat(3, 1fr);
@@ -350,7 +408,7 @@
         </div>
 
         <!-- Overview and Reports (Right Side) -->
-        <div class="space-y-3 flex flex-col h-full">
+        <div class="right-sidebar">
             <!-- Overview Section -->
             <div id="overviewSection" class="overview-section">
                 <div class="overview-card">
@@ -393,6 +451,23 @@
 
             <!-- Events Container (Show Only Newest Event or Selected Event) -->
             <div id="eventsContainer" class="flex-1 space-y-2 overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <span>Powered by PZ | Version 1.0.0</span>
+            </div>
+            <div class="footer-section">
+                <span>© 2025 Vehicle Detection System. All rights reserved.</span>  
+            </div>
+            <div class="footer-section">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact Support</a>
+            </div>
         </div>
     </div>
 
