@@ -79,12 +79,8 @@ WSGI_APPLICATION = 'testapi.wsgi.application'
 
 DATABASES = {
      'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'apidb',  # Replace with your MySQL database name
-        'USER': 'root',  # Replace with MySQL username (default: root)
-        'PASSWORD': 'root',  # Replace with your MySQL password
-        'HOST': 'localhost',  # Keep 'localhost' if running locally
-        'PORT': '3306',  # MySQL default port
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',  # This creates a SQLite file in your project directory
     }
 }
 
